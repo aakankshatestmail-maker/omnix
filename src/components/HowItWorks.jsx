@@ -1,0 +1,277 @@
+import { useEffect, useRef, useState } from 'react'
+import Container from './Container'
+
+const steps = [
+  {
+    title: 'Share your goals',
+    desc: 'Tell Omni your target role, location, salary range, and dealbreakers. No forms, just a conversation.',
+    user: 'I want a product manager role in Bangalore or remote, ₹30L+, preferably fintech or consumer apps.',
+    channels: ['Web', 'WhatsApp', 'Email'],
+  },
+  {
+    title: 'Omni searches non-stop',
+    desc: 'Omni scans every major job board and company careers page, then surfaces new matches daily and ranks them by fit.',
+    bot: '18 new roles found. Top match: Senior PM at Razorpay — 94% fit. 3 others are at companies you\u2019ve shortlisted.',
+    channels: ['Automated', 'Daily digest'],
+  },
+  {
+    title: 'Ship strong applications',
+    desc: 'Ask Omni to tailor your resume for a specific JD, write a cover letter, or draft a cold outreach email in seconds.',
+    user: 'Rewrite my resume for the Razorpay PM role and write a cold email to their talent team.',
+    channels: ['Web', 'WhatsApp'],
+  },
+  {
+    title: 'Know the company cold',
+    desc: 'Get culture notes, interview loops, salary benchmarks, and employee sentiment in a two-minute briefing.',
+    bot: 'Razorpay is Series F, 4.1★ on Glassdoor. PM interviews are 4 rounds: case study, product sense, metrics, leadership.',
+    channels: ['Web'],
+  },
+  {
+    title: 'Rehearse the interview',
+    desc: 'Role-specific mock questions, STAR-method coaching, and instant feedback. Repeat until you feel confident.',
+    user: 'Give me a mock product sense question for Razorpay and score my answer.',
+    channels: ['Web', 'WhatsApp'],
+  },
+]
+
+function Chip({ children }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-2.5 py-0.5 text-[10px] font-medium text-neutral-600">
+      {children}
+    </span>
+  )
+}
+
+function Message({ step, animate = true }) {
+  const isUser = Boolean(step.user)
+  return (
+    <div
+      className={`flex flex-col gap-1.5 ${isUser ? 'items-end' : 'items-start'} ${
+        animate ? 'animate-[msgIn_500ms_ease-out]' : ''
+      }`}
+    >
+      <div
+        className={
+          isUser
+            ? 'max-w-[85%] rounded-2xl rounded-br-sm bg-primary px-4 py-2.5 text-sm text-white shadow-sm shadow-primary/20'
+            : 'max-w-[85%] rounded-2xl rounded-bl-sm border border-neutral-200 bg-neutral-50 px-4 py-2.5 text-sm text-neutral-800'
+        }
+      >
+        {step.user || step.bot}
+      </div>
+      <div className={`flex flex-wrap gap-1.5 ${isUser ? 'justify-end' : 'justify-start'}`}>
+        {step.channels.map((c) => (
+          <Chip key={c}>{c}</Chip>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function ChatWindow({ messages, animate = true, innerRef }) {
+  return (
+    <div className="w-[520px] max-w-full rounded-3xl border border-neutral-200 bg-white shadow-2xl shadow-neutral-900/[0.06] overflow-hidden h-[520px] flex flex-col">
+      <div className="flex items-center gap-2 border-b border-neutral-100 bg-neutral-50 px-5 py-3.5">
+        <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
+        <div className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+        <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
+        <div className="mx-auto flex items-center gap-2 text-xs font-medium text-neutral-500">
+          <span className="h-2 w-2 rounded-full bg-green-500" />
+          Chat with Omni
+        </div>
+      </div>
+      <div
+        ref={innerRef}
+        className="flex-1 overflow-y-auto px-5 py-5 space-y-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
+        {messages.map((s, i) => (
+          <Message key={i} step={s} animate={animate} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function StaticFallback() {
+  return (
+    <Container>
+      <div className="max-w-3xl">
+        <span className="block text-xs md:text-sm uppercase tracking-[0.25em] text-primary font-semibold mb-6">
+          How it works
+        </span>
+        <h2 className="text-4xl md:text-5xl font-bold tracking-[-0.025em] text-neutral-900 leading-[1.05]">
+          Omni handles the full journey — you just have conversations
+        </h2>
+      </div>
+
+      <div className="mt-16 space-y-16">
+        {steps.map((s, i) => (
+          <div key={s.title} className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,440px)] md:gap-12 items-start">
+            <div>
+              <span className="font-mono text-sm text-primary tabular-nums">
+                {String(i + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
+              </span>
+              <h3 className="mt-3 text-3xl md:text-4xl font-bold tracking-[-0.025em] text-neutral-900 leading-[1.1]">
+                {s.title}
+              </h3>
+              <p className="mt-4 text-lg text-neutral-500 max-w-md">{s.desc}</p>
+            </div>
+            <div className="justify-self-start md:justify-self-end">
+              <Message step={s} animate={false} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </Container>
+  )
+}
+
+function PinnedExperience() {
+  const sectionRef = useRef(null)
+  const chatRef = useRef(null)
+  const [active, setActive] = useState(0)
+
+  useEffect(() => {
+    let ticking = false
+    const update = () => {
+      ticking = false
+      const section = sectionRef.current
+      if (!section) return
+      const rect = section.getBoundingClientRect()
+      const scrollable = rect.height - window.innerHeight
+      if (scrollable <= 0) return
+      const progress = Math.min(1, Math.max(0, -rect.top / scrollable))
+      const idx = Math.min(steps.length - 1, Math.floor(progress * steps.length))
+      setActive(idx)
+    }
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true
+        requestAnimationFrame(update)
+      }
+    }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
+
+  useEffect(() => {
+    const el = chatRef.current
+    if (!el) return
+    el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
+  }, [active])
+
+  const jumpTo = (i) => {
+    const section = sectionRef.current
+    if (!section) return
+    const scrollable = section.offsetHeight - window.innerHeight
+    const target = section.offsetTop + (i / steps.length) * scrollable + 1
+    window.scrollTo({ top: target, behavior: 'smooth' })
+  }
+
+  return (
+    <section
+      ref={sectionRef}
+      className="relative"
+      style={{ height: `${steps.length * 55 + 30}vh` }}
+    >
+      <div className="sticky top-0 flex h-screen items-center">
+        <Container>
+          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+            <div className="min-w-0">
+              <span className="block text-xs md:text-sm uppercase tracking-[0.25em] text-primary font-semibold mb-8">
+                How it works
+              </span>
+
+              <div className="relative min-h-[280px]">
+                {steps.map((s, i) => {
+                  const state = i === active ? 'active' : i < active ? 'past' : 'future'
+                  return (
+                    <div
+                      key={s.title}
+                      aria-hidden={state !== 'active'}
+                      className={`absolute inset-0 transition-all duration-500 ease-out ${
+                        state === 'active'
+                          ? 'opacity-100 translate-y-0'
+                          : state === 'past'
+                          ? 'opacity-0 -translate-y-4 pointer-events-none'
+                          : 'opacity-0 translate-y-4 pointer-events-none'
+                      }`}
+                    >
+                      <span className="font-mono text-sm text-primary tabular-nums">
+                        {String(i + 1).padStart(2, '0')} / {String(steps.length).padStart(2, '0')}
+                      </span>
+                      <h2 className="mt-4 text-4xl lg:text-5xl xl:text-6xl font-bold tracking-[-0.03em] text-neutral-900 leading-[1.02]">
+                        {s.title}
+                      </h2>
+                      <p className="mt-6 text-lg text-neutral-500 max-w-md">{s.desc}</p>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <div className="mt-10 flex gap-2">
+                {steps.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => jumpTo(i)}
+                    aria-label={`Go to step ${i + 1}`}
+                    className={`h-1.5 rounded-full transition-all duration-500 hover:!bg-primary ${
+                      i === active
+                        ? 'w-10 bg-primary'
+                        : i < active
+                        ? 'w-6 bg-primary/50'
+                        : 'w-6 bg-neutral-300'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex justify-center lg:justify-end">
+              <ChatWindow
+                messages={steps.slice(0, active + 1)}
+                animate
+                innerRef={chatRef}
+              />
+            </div>
+          </div>
+        </Container>
+      </div>
+    </section>
+  )
+}
+
+export default function HowItWorks() {
+  const [reducedMotion, setReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReducedMotion(mq.matches)
+    const onChange = (e) => setReducedMotion(e.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  return (
+    <section className="bg-neutral-50 py-24 md:py-32">
+      {reducedMotion ? (
+        <StaticFallback />
+      ) : (
+        <>
+          <div className="lg:hidden">
+            <StaticFallback />
+          </div>
+          <div className="hidden lg:block">
+            <PinnedExperience />
+          </div>
+        </>
+      )}
+    </section>
+  )
+}
