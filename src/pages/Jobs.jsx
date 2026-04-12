@@ -287,7 +287,7 @@ function AppliedRow({ job }) {
               {job.status}
             </span>
           </div>
-          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-[#5b5b6e]">
+          <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-[#5b5b6e]">
             <Building2 className="h-3.5 w-3.5" />
             {job.company}
             <span className="text-[#dcdce3]">·</span>

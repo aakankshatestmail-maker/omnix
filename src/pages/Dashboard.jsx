@@ -314,24 +314,28 @@ function Welcome() {
 function Thread() {
   return (
     <ThreadPrimitive.Root className="flex h-full flex-col bg-white">
-      <ThreadPrimitive.Viewport className="flex flex-1 flex-col overflow-y-auto">
-        <AuiIf condition={(s) => s.thread.isEmpty}>
+      <AuiIf condition={(s) => s.thread.isEmpty}>
+        <div className="flex flex-1 flex-col overflow-y-auto">
           <Welcome />
-        </AuiIf>
-
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6">
-          <ThreadPrimitive.Messages
-            components={{ UserMessage, AssistantMessage }}
-          />
         </div>
+      </AuiIf>
 
-        <ThreadPrimitive.ViewportFooter className="sticky bottom-0 mt-auto bg-gradient-to-t from-white via-white to-white/0 px-4 pb-5 pt-3">
-          <Composer />
-          <p className="mt-2 text-center text-[11px] text-[#9a9aae]">
-            Prototype — responses are dummy replies.
-          </p>
-        </ThreadPrimitive.ViewportFooter>
-      </ThreadPrimitive.Viewport>
+      <AuiIf condition={(s) => !s.thread.isEmpty}>
+        <ThreadPrimitive.Viewport className="flex flex-1 flex-col overflow-y-auto">
+          <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6">
+            <ThreadPrimitive.Messages
+              components={{ UserMessage, AssistantMessage }}
+            />
+          </div>
+        </ThreadPrimitive.Viewport>
+      </AuiIf>
+
+      <div className="shrink-0 bg-gradient-to-t from-white via-white to-white/0 px-4 pb-8 pt-3 sm:pb-6">
+        <Composer />
+        <p className="mt-2 text-center text-[11px] text-[#9a9aae]">
+          Prototype — responses are dummy replies.
+        </p>
+      </div>
     </ThreadPrimitive.Root>
   )
 }
