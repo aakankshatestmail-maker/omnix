@@ -1,6 +1,4 @@
-import { useState } from 'react'
 import {
-  Bell,
   Briefcase,
   Clock,
   DollarSign,
@@ -117,17 +115,11 @@ function CompletionRing({ pct }) {
   )
 }
 
-function SectionCard({ icon, title, action, children }) {
-  const Icon = icon
+function SectionCard({ title, action, children }) {
   return (
     <section className="rounded-2xl border border-[#ececf3] bg-white shadow-[0_8px_24px_rgba(11,11,20,0.04)]">
       <header className="flex items-center justify-between border-b border-[#ececf3] px-5 py-3.5">
-        <div className="flex items-center gap-2.5">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Icon className="h-3.5 w-3.5" />
-          </span>
-          <h2 className="text-sm font-semibold text-[#0b0b14]">{title}</h2>
-        </div>
+        <h2 className="text-sm font-semibold text-[#0b0b14]">{title}</h2>
         {action}
       </header>
       <div className="px-5 py-4">{children}</div>
@@ -197,46 +189,7 @@ function PreferenceRow({ icon, label, value }) {
   )
 }
 
-function Toggle({ enabled, onChange, label, description }) {
-  return (
-    <label className="flex cursor-pointer items-start justify-between gap-4 py-2">
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm text-[#0b0b14]">{label}</span>
-        {description && (
-          <span className="mt-0.5 block text-[11px] text-[#9a9aae]">{description}</span>
-        )}
-      </span>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={enabled}
-        onClick={() => onChange(!enabled)}
-        className={`relative mt-0.5 inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
-          enabled ? 'bg-primary' : 'bg-[#ececf3]'
-        }`}
-      >
-        <span
-          className={`inline-block h-4 w-4 rounded-full bg-white shadow-[0_1px_2px_rgba(11,11,20,0.15)] transition-transform ${
-            enabled ? 'translate-x-[18px]' : 'translate-x-0.5'
-          }`}
-        />
-      </button>
-    </label>
-  )
-}
-
 export default function Profile() {
-  const [notif, setNotif] = useState({
-    whatsapp: false,
-    email: true,
-    pullWhatsapp: false,
-    pullEmail: true,
-    digestJobs: true,
-    digestCompany: false,
-    digestSalary: true,
-  })
-
-  const setPref = (key) => (v) => setNotif((p) => ({ ...p, [key]: v }))
   const prefs = PROFILE.preferences
   const salaryRange =
     prefs.salaryMin && prefs.salaryMax
@@ -372,65 +325,6 @@ export default function Profile() {
                 icon={Briefcase}
                 label="Total experience"
                 value={`${prefs.totalExperience} years`}
-              />
-            </div>
-          </SectionCard>
-
-          {/* Notifications */}
-          <SectionCard icon={Bell} title="Notification preferences">
-            <div>
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-[#9a9aae]">
-                Channels
-              </p>
-              <Toggle
-                enabled={notif.whatsapp}
-                onChange={setPref('whatsapp')}
-                label="WhatsApp"
-                description="Get match alerts and interview prep nudges on WhatsApp."
-              />
-              <Toggle
-                enabled={notif.email}
-                onChange={setPref('email')}
-                label="Email"
-                description="Daily digest and recruiter replies land in your inbox."
-              />
-            </div>
-
-            <div className="mt-3 border-t border-[#ececf3] pt-3">
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-[#9a9aae]">
-                Re-engagement
-              </p>
-              <Toggle
-                enabled={notif.pullWhatsapp}
-                onChange={setPref('pullWhatsapp')}
-                label="WhatsApp re-engagement"
-                description="Nudge me if I haven't opened Omni in a few days."
-              />
-              <Toggle
-                enabled={notif.pullEmail}
-                onChange={setPref('pullEmail')}
-                label="Email re-engagement"
-              />
-            </div>
-
-            <div className="mt-3 border-t border-[#ececf3] pt-3">
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-[#9a9aae]">
-                Daily digest content
-              </p>
-              <Toggle
-                enabled={notif.digestJobs}
-                onChange={setPref('digestJobs')}
-                label="Job recommendations"
-              />
-              <Toggle
-                enabled={notif.digestCompany}
-                onChange={setPref('digestCompany')}
-                label="Company reviews"
-              />
-              <Toggle
-                enabled={notif.digestSalary}
-                onChange={setPref('digestSalary')}
-                label="Salary insights"
               />
             </div>
           </SectionCard>

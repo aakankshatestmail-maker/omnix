@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { MOCK_CHAT_GROUPS } from './mockChats'
+import SettingsModal from '../components/SettingsModal'
 import {
   Briefcase,
   ChevronsUpDown,
@@ -29,7 +30,7 @@ function AccountMenuItem({ icon, label, trailing, onClick }) {
   )
 }
 
-function AccountMenu({ user, onSignOut }) {
+function AccountMenu({ user, onSignOut, onOpenSettings }) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef(null)
 
@@ -56,7 +57,15 @@ function AccountMenu({ user, onSignOut }) {
         >
           <p className="truncate px-2.5 pb-2 pt-1.5 text-xs text-[#9a9aae]">{user.email}</p>
           <div className="flex flex-col gap-0.5">
-            <AccountMenuItem icon={Settings} label="Settings" trailing="⇧⌘," />
+            <AccountMenuItem
+              icon={Settings}
+              label="Settings"
+              trailing="⇧⌘,"
+              onClick={() => {
+                setOpen(false)
+                onOpenSettings?.()
+              }}
+            />
             <AccountMenuItem icon={Share2} label="Share Omni" />
           </div>
           <div className="my-1 h-px bg-[#ececf3]" />
@@ -91,7 +100,7 @@ const NAV_ITEMS = [
   { icon: Layers, label: 'Artifacts', to: '/dashboard/artifacts' },
 ]
 
-function Sidebar({ open, onToggle, onClose, onSignOut }) {
+function Sidebar({ open, onToggle, onClose, onSignOut, onOpenSettings }) {
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const activeChatId =
@@ -201,6 +210,7 @@ function Sidebar({ open, onToggle, onClose, onSignOut }) {
                 initials: 'TD',
               }}
               onSignOut={onSignOut}
+              onOpenSettings={onOpenSettings}
             />
           </div>
         </div>
@@ -215,6 +225,7 @@ export default function DashboardLayout({ children }) {
   const isDesktop =
     typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches
   const [sidebarOpen, setSidebarOpen] = useState(isDesktop)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (
     <div className="flex h-svh w-full bg-white text-[#0b0b14]">
@@ -223,7 +234,9 @@ export default function DashboardLayout({ children }) {
         onToggle={() => setSidebarOpen((v) => !v)}
         onClose={() => setSidebarOpen(false)}
         onSignOut={() => navigate('/')}
+        onOpenSettings={() => setSettingsOpen(true)}
       />
+      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <main className="relative flex h-full flex-1 flex-col overflow-hidden">
         <header className="relative flex h-14 shrink-0 items-center justify-center border-b border-[#ececf3] bg-white/90 px-4 backdrop-blur-md md:hidden">
           <button
