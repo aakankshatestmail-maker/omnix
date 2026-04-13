@@ -24,7 +24,7 @@ export default function PillarsScroll() {
             {pillars.map((p, i) => (
               <article
                 key={p.title}
-                className="group relative md:sticky md:top-[var(--card-top)] overflow-hidden rounded-3xl bg-white border border-black/[0.06] p-8 sm:p-10 md:p-12 flex flex-col gap-10 sm:gap-0 sm:justify-between sm:min-h-[380px] shadow-[0_24px_60px_-28px_rgba(11,11,20,0.18)] transition-transform duration-500 hover:-translate-y-0.5"
+                className="group relative md:sticky md:top-[var(--card-top)] overflow-hidden rounded-3xl bg-white border border-black/[0.06] p-8 sm:p-10 md:p-12 flex flex-col gap-10 sm:gap-0 sm:justify-between sm:min-h-[380px]  transition-transform duration-500 hover:-translate-y-0.5"
                 style={{ '--card-top': `calc(50vh - 11rem + ${i * 1.25}rem)` }}
               >
                 {/* Big faded pillar numeral */}
