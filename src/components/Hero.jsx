@@ -62,7 +62,7 @@ export default function Hero({ onOpenAuth }) {
       <div className="relative z-10 flex h-full w-full flex-col items-center justify-center text-center  px-5 sm:px-6">
         <img src="/bot.png" alt="Omni bot" className="w-[60vw] max-w-[280px] sm:w-64 md:w-80 mb-6 sm:mb-8 drop-shadow-xl" />
         <div className="relative inline-block">
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-[-0.03em] text-neutral-900 leading-[1.05] max-w-5xl">
+          <h1 className="text-3xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-[-0.03em] text-neutral-900 leading-[1.05] max-w-5xl">
             Get Hired Faster
             <br />
             with <span className="text-primary">Omni</span>

@@ -44,7 +44,7 @@ export default function Navbar({ onOpenAuth }) {
           <span className="text-xl font-semibold tracking-tight ">
             {nav.brand}
           </span>
-          <div className='pl-2 pt-1  text-gray-500'>AI career Agent</div>
+          <div className='hidden md:block pl-2 pt-1  text-gray-500'>AI career Agent</div>
         </a>
 
         <nav className="hidden items-center gap-8 md:flex">
