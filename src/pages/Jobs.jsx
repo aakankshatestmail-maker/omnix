@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import {
-  Bookmark,
   BriefcaseBusiness,
   Building2,
   CheckCircle2,
@@ -8,6 +7,7 @@ import {
   ExternalLink,
   MapPin,
   Sparkles,
+  Users,
   Wallet,
 } from 'lucide-react'
 
@@ -17,15 +17,17 @@ const RECOMMENDED = [
     company: 'Razorpay',
     logoColor: 'bg-[#0C2451]',
     logoInitial: 'R',
-    title: 'Senior Frontend Engineer',
-    location: 'Bengaluru · Hybrid',
-    salary: '₹45L – ₹70L',
+    title: 'Senior Frontend Engineer, Payments',
+    location: 'Bengaluru · Hybrid (3 days)',
+    salary: '₹48L – ₹72L + ESOPs',
     type: 'Full-time',
+    experience: '5–8 yrs',
     postedDaysAgo: 2,
-    tags: ['React', 'TypeScript', 'Design systems'],
+    applicants: 142,
+    tags: ['React', 'TypeScript', 'Design systems', 'Micro-frontends'],
     match: 94,
     summary:
-      'Build merchant-facing dashboards used by lakhs of Indian businesses. Work closely with design on performance-critical UI.',
+      'Own the merchant dashboard trusted by 1M+ Indian businesses — from kirana stores to unicorns. Ship payment flows where every millisecond and every rupee matters.',
   },
   {
     id: 'r2',
@@ -34,13 +36,15 @@ const RECOMMENDED = [
     logoInitial: 'Z',
     title: 'Product Manager, Kite',
     location: 'Bengaluru · On-site',
-    salary: '₹50L – ₹80L',
+    salary: '₹55L – ₹85L',
     type: 'Full-time',
+    experience: '6–10 yrs',
     postedDaysAgo: 4,
-    tags: ['Fintech', 'Trading', '0→1'],
+    applicants: 368,
+    tags: ['Fintech', 'Trading', 'SEBI', '0→1'],
     match: 89,
     summary:
-      "Lead product on Kite, India's largest retail trading platform serving over a crore investors.",
+      "Lead product on Kite, India's largest retail broker serving 1.6Cr+ investors. Bootstrapped, profitable, zero-debt — shape the next decade of Indian retail trading.",
   },
   {
     id: 'r3',
@@ -49,13 +53,15 @@ const RECOMMENDED = [
     logoInitial: 'S',
     title: 'Staff Software Engineer, Platform',
     location: 'Remote · India',
-    salary: '₹60L – ₹95L',
+    salary: '₹62L – ₹98L + RSUs',
     type: 'Full-time',
+    experience: '8+ yrs',
     postedDaysAgo: 1,
-    tags: ['Distributed systems', 'Scale', 'Go'],
+    applicants: 89,
+    tags: ['Go', 'Kafka', 'Kubernetes', 'Distributed systems'],
     match: 87,
     summary:
-      'Own core platform services powering food, Instamart, and Dineout across every Indian city.',
+      'Own core platform services powering Food, Instamart, and Dineout across 650+ Indian cities. 4M+ orders/day, sub-30 min SLAs, hyperlocal scale.',
   },
   {
     id: 'r4',
@@ -64,28 +70,32 @@ const RECOMMENDED = [
     logoInitial: 'C',
     title: 'Senior Design Engineer',
     location: 'Bengaluru · Hybrid',
-    salary: '₹40L – ₹65L',
+    salary: '₹42L – ₹68L + ESOPs',
     type: 'Full-time',
+    experience: '4–7 yrs',
     postedDaysAgo: 6,
-    tags: ['React Native', 'Prototyping', 'UI'],
+    applicants: 276,
+    tags: ['React Native', 'Reanimated', 'Prototyping', 'Motion'],
     match: 83,
     summary:
-      'Bridge design and engineering to ship beautiful, thoughtful features to premium Indian credit card users.',
+      'Bridge design and engineering to ship obsessively-crafted features for India\'s most creditworthy. Craft matters here more than velocity.',
   },
   {
     id: 'r5',
-    company: 'Postman',
-    logoColor: 'bg-[#FF6C37]',
+    company: 'PhonePe',
+    logoColor: 'bg-[#5F259F]',
     logoInitial: 'P',
-    title: 'Product Designer, AI',
-    location: 'Bengaluru · Hybrid',
-    salary: '₹38L – ₹60L',
+    title: 'Engineering Manager, Payments',
+    location: 'Bengaluru · On-site',
+    salary: '₹70L – ₹1.1Cr + RSUs',
     type: 'Full-time',
+    experience: '10+ yrs',
     postedDaysAgo: 3,
-    tags: ['AI/UX', 'Systems', 'Research'],
+    applicants: 54,
+    tags: ['UPI', 'Java', 'Scale', 'Leadership'],
     match: 81,
     summary:
-      'Design intelligent, approachable AI features inside the Postman API platform used worldwide.',
+      'Lead a team building UPI infra that processes 50%+ of India\'s digital payments. 10B+ transactions a month, zero room for downtime.',
   },
   {
     id: 'r6',
@@ -94,13 +104,49 @@ const RECOMMENDED = [
     logoInitial: 'G',
     title: 'Frontend Engineer, Growth',
     location: 'Bengaluru · On-site',
-    salary: '₹35L – ₹55L',
+    salary: '₹36L – ₹56L + ESOPs',
     type: 'Full-time',
+    experience: '3–6 yrs',
     postedDaysAgo: 5,
-    tags: ['React', 'Next.js', 'Performance'],
+    applicants: 421,
+    tags: ['Next.js', 'React', 'A/B testing', 'Web vitals'],
     match: 96,
     summary:
-      'Help millions of first-time Indian investors discover, invest, and track mutual funds and stocks.',
+      'Help 1Cr+ first-time investors discover mutual funds, stocks, and F&O. Ship growth experiments where LCP and conversion rate move together.',
+  },
+  {
+    id: 'r7',
+    company: 'Flipkart',
+    logoColor: 'bg-[#2874F0]',
+    logoInitial: 'F',
+    title: 'Principal Engineer, Search & Discovery',
+    location: 'Bengaluru · Hybrid',
+    salary: '₹90L – ₹1.4Cr + RSUs',
+    type: 'Full-time',
+    experience: '12+ yrs',
+    postedDaysAgo: 7,
+    applicants: 112,
+    tags: ['Search', 'ML', 'Ranking', 'ElasticSearch'],
+    match: 85,
+    summary:
+      'Own search relevance and discovery for The Big Billion Days — India\'s largest e-commerce event. 40Cr+ users, Bharat-first vernacular queries, peak traffic like no other.',
+  },
+  {
+    id: 'r8',
+    company: 'Zepto',
+    logoColor: 'bg-[#6B3FE2]',
+    logoInitial: 'Z',
+    title: 'Senior Backend Engineer, Fulfillment',
+    location: 'Mumbai · On-site',
+    salary: '₹40L – ₹65L + ESOPs',
+    type: 'Full-time',
+    experience: '4–7 yrs',
+    postedDaysAgo: 1,
+    applicants: 187,
+    tags: ['Node.js', 'PostgreSQL', 'Redis', 'Real-time'],
+    match: 88,
+    summary:
+      'Build the dispatch brain behind 10-minute grocery delivery across 7 metros. Dark stores, rider routing, inventory sync — every second counts.',
   },
 ]
 
@@ -110,12 +156,12 @@ const APPLIED = [
     company: 'Razorpay',
     logoColor: 'bg-[#0C2451]',
     logoInitial: 'R',
-    title: 'Senior Frontend Engineer',
+    title: 'Senior Frontend Engineer, Payments',
     location: 'Bengaluru · Hybrid',
-    salary: '₹45L – ₹70L',
+    salary: '₹48L – ₹72L',
     status: 'Interviewing',
     statusTint: 'bg-[#DCFCE7] text-[#15803D]',
-    stage: 'Round 2 of 4 · Technical screen',
+    stage: 'Round 2 of 4 · System design with Khilan',
     appliedDaysAgo: 5,
   },
   {
@@ -125,10 +171,10 @@ const APPLIED = [
     logoInitial: 'S',
     title: 'Staff Software Engineer, Platform',
     location: 'Remote · India',
-    salary: '₹60L – ₹95L',
+    salary: '₹62L – ₹98L',
     status: 'In review',
     statusTint: 'bg-[#FEF3C7] text-[#A16207]',
-    stage: 'Application under review',
+    stage: 'Recruiter screen scheduled · Apr 17',
     appliedDaysAgo: 2,
   },
   {
@@ -136,16 +182,29 @@ const APPLIED = [
     company: 'Zomato',
     logoColor: 'bg-[#E23744]',
     logoInitial: 'Z',
-    title: 'Senior Product Engineer',
+    title: 'Senior Product Engineer, Hyperpure',
     location: 'Gurugram · On-site',
-    salary: '₹48L – ₹72L',
+    salary: '₹52L – ₹78L',
     status: 'Offer',
     statusTint: 'bg-[#E0E7FF] text-[#4338CA]',
-    stage: 'Offer extended · Negotiating',
+    stage: 'Offer extended · Negotiating base + ESOPs',
     appliedDaysAgo: 14,
   },
   {
     id: 'a4',
+    company: 'Nykaa',
+    logoColor: 'bg-[#E6097A]',
+    logoInitial: 'N',
+    title: 'Lead Frontend Engineer, Commerce',
+    location: 'Mumbai · Hybrid',
+    salary: '₹45L – ₹68L',
+    status: 'Interviewing',
+    statusTint: 'bg-[#DCFCE7] text-[#15803D]',
+    stage: 'Round 3 of 4 · Culture round with hiring manager',
+    appliedDaysAgo: 9,
+  },
+  {
+    id: 'a5',
     company: 'Meesho',
     logoColor: 'bg-[#F43397]',
     logoInitial: 'M',
@@ -154,8 +213,21 @@ const APPLIED = [
     salary: '₹38L – ₹58L',
     status: 'Rejected',
     statusTint: 'bg-[#FEE2E2] text-[#B91C1C]',
-    stage: 'Not moving forward',
+    stage: 'Not moving forward after tech screen · Apr 3',
     appliedDaysAgo: 21,
+  },
+  {
+    id: 'a6',
+    company: 'Ola',
+    logoColor: 'bg-[#C5E84B]',
+    logoInitial: 'O',
+    title: 'Senior Android Engineer, Krutrim',
+    location: 'Bengaluru · On-site',
+    salary: '₹50L – ₹75L',
+    status: 'Withdrawn',
+    statusTint: 'bg-[#F3F4F6] text-[#4B5563]',
+    stage: 'You withdrew · better fit at Zomato',
+    appliedDaysAgo: 12,
   },
 ]
 
@@ -174,32 +246,6 @@ function CompanyLogo({ color, initial }) {
   )
 }
 
-function MatchRing({ value }) {
-  const radius = 18
-  const circumference = 2 * Math.PI * radius
-  const offset = circumference - (value / 100) * circumference
-  return (
-    <div className="relative flex h-11 w-11 shrink-0 items-center justify-center">
-      <svg className="h-11 w-11 -rotate-90" viewBox="0 0 44 44" aria-hidden="true">
-        <circle cx="22" cy="22" r={radius} fill="none" stroke="#ececf3" strokeWidth="3" />
-        <circle
-          cx="22"
-          cy="22"
-          r={radius}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          className="text-primary transition-[stroke-dashoffset]"
-        />
-      </svg>
-      <span className="absolute text-[10px] font-semibold text-[#0b0b14]">{value}</span>
-    </div>
-  )
-}
-
 function RecommendedCard({ job }) {
   return (
     <article className="group flex flex-col gap-4 rounded-2xl border border-[#ececf3] bg-white p-5 transition-all hover:-translate-y-[1px] hover:border-primary/30 hover:shadow-[0_8px_24px_rgba(11,11,20,0.06)]">
@@ -213,12 +259,9 @@ function RecommendedCard({ job }) {
             <h3 className="truncate text-base font-semibold text-[#0b0b14]">{job.title}</h3>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="hidden items-center gap-1 rounded-full bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary sm:flex">
-            <Sparkles className="h-3 w-3" />
-            {job.match}% match
-          </div>
-          <MatchRing value={job.match} />
+        <div className="flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-semibold text-primary">
+          <Sparkles className="h-3 w-3" />
+          {job.match}% match
         </div>
       </div>
 
@@ -235,11 +278,15 @@ function RecommendedCard({ job }) {
         </span>
         <span className="inline-flex items-center gap-1.5">
           <BriefcaseBusiness className="h-3.5 w-3.5" />
-          {job.type}
+          {job.experience}
         </span>
         <span className="inline-flex items-center gap-1.5">
           <Clock className="h-3.5 w-3.5" />
           {job.postedDaysAgo}d ago
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <Users className="h-3.5 w-3.5" />
+          {job.applicants} applicants
         </span>
       </div>
 
@@ -261,13 +308,6 @@ function RecommendedCard({ job }) {
         >
           Apply with Omni
           <ExternalLink className="h-3.5 w-3.5" />
-        </button>
-        <button
-          type="button"
-          aria-label="Save job"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#ececf3] text-[#5b5b6e] hover:border-primary/40 hover:text-primary transition-colors"
-        >
-          <Bookmark className="h-4 w-4" />
         </button>
       </div>
     </article>

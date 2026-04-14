@@ -3,18 +3,26 @@ import { Link } from 'react-router-dom'
 import { Plus, Search } from 'lucide-react'
 
 const ALL_CHATS = [
-  { title: 'Candidate evaluation', lastMessageMinutes: 56 },
-  { title: 'Personal AI Tamagotchi concept', lastMessageMinutes: 13 * 60 },
-  { title: 'Thinking through a decision', lastMessageMinutes: 2 * 24 * 60 },
-  { title: 'Improving content strategy', lastMessageMinutes: 3 * 24 * 60 },
-  { title: 'Lake view hotels in Nainital for April 10-12', lastMessageMinutes: 5 * 24 * 60 },
-  { title: 'Convert to markdown', lastMessageMinutes: 5 * 24 * 60 },
-  { title: 'Creating a UI wrapper', lastMessageMinutes: 6 * 24 * 60 },
-  { title: 'Competitor product audit', lastMessageMinutes: 6 * 24 * 60 },
-  { title: 'Astrology app for Gen Z', lastMessageMinutes: 8 * 24 * 60 },
-  { title: 'Installing Paperclip on a VPS', lastMessageMinutes: 9 * 24 * 60 },
-  { title: 'Resume bullets for a Stripe PM role', lastMessageMinutes: 11 * 24 * 60 },
-  { title: 'Behavioral interview practice', lastMessageMinutes: 14 * 24 * 60 },
+  { title: 'Senior React developer — 5 YOE, Bangalore', lastMessageMinutes: 12, preview: 'Shortlisted 8 candidates. Priya Sharma has strong Redux + TypeScript background.' },
+  { title: 'Rewrite JD for Staff Backend Engineer', lastMessageMinutes: 47, preview: 'Draft 3 looks good. Removed gendered language, added remote-first clause.' },
+  { title: 'Screening questions for Product Designer role', lastMessageMinutes: 2 * 60 + 15, preview: 'Generated 12 behavioral + 4 portfolio review prompts.' },
+  { title: 'Compare Rahul K. vs Anjali M. for PM role', lastMessageMinutes: 4 * 60, preview: 'Rahul stronger on analytics, Anjali better stakeholder management.' },
+  { title: 'Salary benchmark: DevOps engineer Pune', lastMessageMinutes: 7 * 60, preview: '18-28 LPA median for 4-6 YOE per Levels.fyi and Glassdoor data.' },
+  { title: 'Draft offer letter — Kavya Reddy', lastMessageMinutes: 11 * 60, preview: 'Joining date 2026-05-02, base 32 LPA + 4L ESOPs over 4 years.' },
+  { title: 'Why is hiring funnel dropping at tech round?', lastMessageMinutes: 22 * 60, preview: '62% drop at round 2. Likely coding test too long — suggest trimming to 45min.' },
+  { title: 'Source passive candidates from GitHub', lastMessageMinutes: 1 * 24 * 60 + 3 * 60, preview: 'Found 34 profiles matching Rust + distributed systems in India.' },
+  { title: 'Interview feedback summary — Arjun P.', lastMessageMinutes: 2 * 24 * 60, preview: 'Strong system design, weak on SQL. Panel leaning hire for L4.' },
+  { title: 'LinkedIn InMail templates that convert', lastMessageMinutes: 2 * 24 * 60 + 8 * 60, preview: 'Template with personalized repo reference got 41% reply rate.' },
+  { title: 'Diversity hiring strategy Q2 2026', lastMessageMinutes: 3 * 24 * 60, preview: 'Target 40% women in tech pipeline. Partner with WomenWhoCode Bangalore.' },
+  { title: 'Reject email — kind but clear', lastMessageMinutes: 3 * 24 * 60 + 5 * 60, preview: 'Softer wording for final-round rejects, added feedback offer.' },
+  { title: 'Notice period negotiation — Vikram S.', lastMessageMinutes: 4 * 24 * 60, preview: 'Current 90 days, asking buyout of 45. Counter with 60-day release.' },
+  { title: 'Parse 120 resumes for Data Scientist JD', lastMessageMinutes: 5 * 24 * 60, preview: 'Ranked top 15. Flagged 3 with embellished credentials for verification.' },
+  { title: 'Onboarding checklist for remote hires', lastMessageMinutes: 6 * 24 * 60, preview: 'Day 1-30-60-90 plan with laptop shipping, buddy assignment, goals.' },
+  { title: 'Competitor hiring activity — Razorpay', lastMessageMinutes: 7 * 24 * 60, preview: 'Opened 47 roles last month. Heavy push on backend + ML infra.' },
+  { title: 'Reference check script for senior roles', lastMessageMinutes: 9 * 24 * 60, preview: '8 questions covering leadership, conflict, tech depth. Legally safe phrasing.' },
+  { title: 'Glassdoor review response — negative interview feedback', lastMessageMinutes: 11 * 24 * 60, preview: 'Empathetic reply acknowledging delay, inviting DM for specifics.' },
+  { title: 'ATS keyword optimization for ML Engineer JD', lastMessageMinutes: 13 * 24 * 60, preview: 'Added PyTorch, MLflow, feature store. Removed vague buzzwords.' },
+  { title: 'Campus hiring plan — IIT Hyderabad 2026', lastMessageMinutes: 18 * 24 * 60, preview: 'Slot booked Aug 12. Need PPT, 2 panelists, pre-placement talk content.' },
 ]
 
 function formatRelative(minutes) {
@@ -33,7 +41,9 @@ export default function Chats() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return ALL_CHATS
-    return ALL_CHATS.filter((c) => c.title.toLowerCase().includes(q))
+    return ALL_CHATS.filter(
+      (c) => c.title.toLowerCase().includes(q) || c.preview.toLowerCase().includes(q),
+    )
   }, [query])
 
   return (
@@ -71,7 +81,8 @@ export default function Chats() {
                   className="flex flex-col gap-1 py-4 transition-colors hover:bg-black/[0.02]"
                 >
                   <span className="text-base font-medium text-[#0b0b14]">{c.title}</span>
-                  <span className="text-sm text-[#9a9aae]">
+                  <span className="line-clamp-1 text-sm text-[#5b5b6e]">{c.preview}</span>
+                  <span className="text-xs text-[#9a9aae]">
                     Last message {formatRelative(c.lastMessageMinutes)}
                   </span>
                 </Link>

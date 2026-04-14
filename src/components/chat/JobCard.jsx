@@ -8,14 +8,14 @@ function initials(name = '') {
 }
 
 function logoGradient(name = '') {
-  const gradients = [
-    'from-[#4141fc] to-[#8b5cf6]',
-    'from-[#0ea5e9] to-[#4141fc]',
-    'from-[#f59e0b] to-[#ef4444]',
-    'from-[#10b981] to-[#0891b2]',
-    'from-[#ec4899] to-[#8b5cf6]',
+  const tones = [
+    'bg-slate-200 text-gray-800',
+    'bg-stone-200 text-gray-800',
+    'bg-zinc-200 text-gray-800',
+    'bg-neutral-200 text-gray-800',
+    'bg-gray-200 text-gray-800',
   ]
-  return gradients[(name.charCodeAt(0) || 0) % gradients.length]
+  return tones[(name.charCodeAt(0) || 0) % tones.length]
 }
 
 function matchTone(score) {
@@ -30,10 +30,10 @@ export default function JobCard({ job }) {
   const skills = (job.skills ?? []).slice(0, 6)
 
   return (
-    <div className="rounded-2xl border border-[#ececf3] bg-white p-4 shadow-[0_8px_24px_rgba(11,11,20,0.04)] transition-all hover:border-primary/30 hover:shadow-[0_12px_32px_rgba(65,65,252,0.08)]">
+    <div className="rounded-2xl border border-[#ececf3] bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30">
       <div className="flex items-start gap-3">
         <div
-          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-sm font-semibold text-white shadow-sm ${logoGradient(job.company)}`}
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-sm font-semibold ${logoGradient(job.company)}`}
         >
           {initials(job.company)}
         </div>
@@ -88,7 +88,7 @@ export default function JobCard({ job }) {
           {skills.map((s) => (
             <span
               key={s}
-              className="rounded-full border border-primary/15 bg-primary/[0.06] px-2.5 py-0.5 text-[11px] font-medium text-primary"
+              className="rounded-full border border-primary/15 bg-primary/6 px-2.5 py-0.5 text-[11px] font-medium text-primary"
             >
               {s}
             </span>
@@ -105,7 +105,7 @@ export default function JobCard({ job }) {
             className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
               feedback === 'up'
                 ? 'bg-primary/10 text-primary'
-                : 'text-[#9a9aae] hover:bg-black/[0.04] hover:text-[#0b0b14]'
+                : 'text-[#9a9aae] hover:bg-black/4 hover:text-[#0b0b14]'
             }`}
           >
             <ThumbsUp className="h-3.5 w-3.5" />
@@ -117,7 +117,7 @@ export default function JobCard({ job }) {
             className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
               feedback === 'down'
                 ? 'bg-[#fff1f2] text-[#e11d48]'
-                : 'text-[#9a9aae] hover:bg-black/[0.04] hover:text-[#0b0b14]'
+                : 'text-[#9a9aae] hover:bg-black/4 hover:text-[#0b0b14]'
             }`}
           >
             <ThumbsDown className="h-3.5 w-3.5" />
@@ -128,7 +128,7 @@ export default function JobCard({ job }) {
           type="button"
           onClick={() => setApplied(true)}
           disabled={applied}
-          className="inline-flex items-center gap-1 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-white shadow-[0_6px_16px_rgba(65,65,252,0.25)] transition-all hover:bg-primary-hover disabled:bg-[#10b981] disabled:shadow-none"
+          className="inline-flex items-center gap-1 rounded-full bg-primary px-3.5 py-1.5 text-xs font-semibold text-white transition-all hover:bg-primary-hover disabled:bg-[#10b981]"
         >
           {applied ? 'Applied' : 'Apply'}
           {!applied && <ArrowUpRight className="h-3.5 w-3.5" />}

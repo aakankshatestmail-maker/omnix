@@ -20,7 +20,6 @@ import {
   Building2,
   Eraser,
   FileText,
-  Mail,
   MessageCircle,
   MessageSquare,
   Mic,
@@ -269,14 +268,6 @@ const SLASH_COMMANDS = [
     icon: Building2,
     tint: 'bg-orange-500',
     prompt: 'Give me a company review and ratings breakdown for ',
-  },
-  {
-    slug: '/emails',
-    label: 'Email Job Tracker',
-    desc: 'Track job-related emails from your inbox',
-    icon: Mail,
-    tint: 'bg-rose-500',
-    prompt: 'Show me the latest job-related emails in my inbox.',
   },
   {
     slug: '/settings',
