@@ -1,15 +1,23 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ArrowUp, Mic, Paperclip, Sparkles } from 'lucide-react'
 import { heroLines, heroScenes, blobColors, blobPositions } from '../data/heroContent'
 
 export default function HeroAnimated() {
+  const navigate = useNavigate()
+  const [navigating, setNavigating] = useState(false)
   const [activeIdx, setActiveIdx] = useState(0)
   const [isBlack, setIsBlack] = useState(false)
+  const [isActive, setIsActive] = useState(false)
+  const [inputValue, setInputValue] = useState('')
   const cmdTextRef = useRef(null)
   const cmdCardsRef = useRef(null)
   const blob1 = useRef(null)
   const blob2 = useRef(null)
   const blob3 = useRef(null)
   const typingRef = useRef(null)
+  const inputRef = useRef(null)
+  const isActiveRef = useRef(false)
 
   const flashBg = useCallback((idx) => {
     const c = blobColors[idx]
@@ -66,6 +74,33 @@ export default function HeroAnimated() {
     })
   }, [flashBg, typeText])
 
+  const handleActivate = useCallback(() => {
+    if (navigating || isActiveRef.current) return
+    clearInterval(typingRef.current)
+    // Clear cards before React reconciles — they were injected via innerHTML
+    // outside React's virtual DOM, so we must flush them before the branch switch
+    if (cmdCardsRef.current) {
+      cmdCardsRef.current.classList.remove('visible')
+      cmdCardsRef.current.innerHTML = ''
+    }
+    isActiveRef.current = true
+    setIsActive(true)
+    setInputValue('')
+    // Freeze blobs in place
+    ;[blob1, blob2, blob3].forEach(ref => {
+      if (ref.current) ref.current.style.transition = 'none'
+    })
+    requestAnimationFrame(() => inputRef.current?.focus())
+  }, [navigating])
+
+  const handleSubmit = useCallback(() => {
+    const text = inputValue.trim()
+    if (!text || navigating) return
+    setNavigating(true)
+    const q = encodeURIComponent(text)
+    setTimeout(() => navigate(`/dashboard?guest=true&q=${q}`), 320)
+  }, [inputValue, navigating, navigate])
+
   useEffect(() => {
     flashBg(0)
     showScene(0)
@@ -73,13 +108,15 @@ export default function HeroAnimated() {
 
     let cur = 0
     function cycle() {
+      if (isActiveRef.current) return
       const ni = (cur + 1) % heroLines.length
       if (cmdCardsRef.current) cmdCardsRef.current.classList.remove('visible')
-      clearText(() => showScene(ni))
+      clearText(() => { if (!isActiveRef.current) showScene(ni) })
       flashBg(ni)
       setIsBlack(false)
       setActiveIdx(-1)
       setTimeout(() => {
+        if (isActiveRef.current) return
         setActiveIdx(ni)
         setIsBlack(false)
         setTimeout(() => setIsBlack(true), 600)
@@ -93,6 +130,14 @@ export default function HeroAnimated() {
 
   return (
     <section className="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-20 relative overflow-hidden">
+      {/* Page-exit overlay */}
+      <div
+        className="fixed inset-0 z-[100] bg-white pointer-events-none"
+        style={{
+          opacity: navigating ? 1 : 0,
+          transition: navigating ? 'opacity 0.28s ease-in' : 'none',
+        }}
+      />
       {/* Blobs */}
       <div ref={blob1} className="absolute rounded-full pointer-events-none" style={{ width: 520, height: 420, top: '4%', left: '3%', filter: 'blur(80px)', background: 'rgba(186,218,255,.35)' }} />
       <div ref={blob2} className="absolute rounded-full pointer-events-none" style={{ width: 420, height: 360, top: '6%', right: '3%', filter: 'blur(80px)', background: 'rgba(255,210,180,.3)' }} />
@@ -161,23 +206,83 @@ export default function HeroAnimated() {
           </div>
 
           {/* CMD card */}
-          <div className="relative z-[2] w-full rounded-[18px] overflow-hidden transition-shadow hover:shadow-lg" style={{ background: 'rgba(255,255,255,.88)', border: '1px solid var(--border)', boxShadow: '0 4px 24px rgba(0,0,0,.06)' }}>
-            <div className="flex items-start gap-2.5 pt-4 px-[18px]">
-              <svg className="w-[17px] h-[17px] flex-shrink-0 mt-[3px]" viewBox="0 0 24 24" fill="none" stroke="var(--light)" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-              <div ref={cmdTextRef} className="text-[14.5px] leading-[1.5] flex-1 min-h-[22px] text-left" style={{ color: 'var(--black)' }}>
-                <span style={{ display: 'inline-block', width: '1.5px', height: 16, background: 'var(--mid)', verticalAlign: 'text-bottom', marginLeft: 1, animation: 'blink .8s steps(1) infinite' }} />
+          <div
+            className="relative z-[2] w-full rounded-[18px] overflow-hidden"
+            style={{
+              background: isActive ? 'rgba(255,255,255,.97)' : 'rgba(255,255,255,.88)',
+              border: isActive ? '1px solid rgba(74,79,253,0.35)' : '1px solid var(--border)',
+              boxShadow: isActive
+                ? '0 4px 24px rgba(0,0,0,.08), 0 0 0 4px rgba(74,79,253,0.08)'
+                : navigating ? '0 12px 48px rgba(0,0,0,.14)' : '0 4px 24px rgba(0,0,0,.06)',
+              transform: navigating ? 'scale(1.025)' : 'scale(1)',
+              transition: 'transform 0.28s cubic-bezier(.16,1,.3,1), box-shadow 0.28s ease, border-color 0.2s ease',
+              cursor: isActive ? 'default' : 'text',
+              minHeight: 120,
+            }}
+            onClick={!isActive ? handleActivate : undefined}
+          >
+            {isActive ? (
+              /* ── Active / interactive state ── */
+              <div key="active" className="flex flex-col" style={{ minHeight: 120 }}>
+                <div className="flex items-start gap-2.5 pt-4 px-[18px] flex-1">
+                  <svg className="w-[17px] h-[17px] flex-shrink-0 mt-[3px]" viewBox="0 0 24 24" fill="none" stroke="var(--light)" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                  <textarea
+                    ref={inputRef}
+                    value={inputValue}
+                    onChange={e => setInputValue(e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit() }
+                    }}
+                    rows={1}
+                    placeholder="Ask Omni anything about your job search…"
+                    className="text-[14.5px] leading-[1.5] flex-1 min-h-[22px] text-left bg-transparent outline-none resize-none placeholder:text-[color:var(--light)]"
+                    style={{ color: 'var(--black)' }}
+                  />
+                </div>
+                <div className="flex items-center justify-between pb-2.5 pr-2.5 pl-[18px] pt-1">
+                  <div className="flex items-center gap-0.5">
+                    <button type="button" className="w-9 h-9 flex items-center justify-center rounded-full transition-colors hover:bg-black/[0.04]" style={{ color: 'var(--mid)' }}>
+                      <Paperclip className="w-4 h-4" />
+                    </button>
+                    <button type="button" className="w-9 h-9 flex items-center justify-center rounded-full transition-colors hover:bg-black/[0.04]" style={{ color: 'var(--mid)' }}>
+                      <Mic className="w-4 h-4" />
+                    </button>
+                    <button type="button" className="w-9 h-9 flex items-center justify-center rounded-full transition-colors hover:bg-black/[0.04]" style={{ color: 'var(--mid)' }}>
+                      <Sparkles className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={!inputValue.trim()}
+                    className="w-8 h-8 rounded-full border-none flex items-center justify-center transition-all hover:scale-105 disabled:opacity-30"
+                    style={{ background: 'var(--black)', cursor: inputValue.trim() ? 'pointer' : 'default' }}
+                  >
+                    <ArrowUp className="w-3.5 h-3.5 text-white" />
+                  </button>
+                </div>
               </div>
-            </div>
-            <div ref={cmdCardsRef} className="px-[18px] pt-3 flex gap-2 flex-wrap" style={{ opacity: 0, transform: 'translateY(6px)', transition: 'opacity .4s ease, transform .4s ease' }} />
-            <div className="flex items-center justify-between py-3 pr-3 pl-[18px]">
-              <span className="text-[11.5px] flex items-center gap-[5px]" style={{ color: 'var(--light)' }}>
-                <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="var(--light)" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                Upload resume or paste JD
-              </span>
-              <button className="w-8 h-8 rounded-full border-none flex items-center justify-center cursor-pointer transition-transform hover:scale-105" style={{ background: 'var(--black)' }}>
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="var(--white)" strokeWidth="2.5"><line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" /></svg>
-              </button>
-            </div>
+            ) : (
+              /* ── Animated / teaser state ── */
+              <div key="animated">
+                <div className="flex items-start gap-2.5 pt-4 px-[18px]">
+                  <svg className="w-[17px] h-[17px] flex-shrink-0 mt-[3px]" viewBox="0 0 24 24" fill="none" stroke="var(--light)" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+                  <div ref={cmdTextRef} className="text-[14.5px] leading-[1.5] flex-1 min-h-[22px] text-left" style={{ color: 'var(--black)' }}>
+                    <span style={{ display: 'inline-block', width: '1.5px', height: 16, background: 'var(--mid)', verticalAlign: 'text-bottom', marginLeft: 1, animation: 'blink .8s steps(1) infinite' }} />
+                  </div>
+                </div>
+                <div ref={cmdCardsRef} className="px-[18px] pt-3 flex gap-2 flex-wrap" style={{ opacity: 0, transform: 'translateY(6px)', transition: 'opacity .4s ease, transform .4s ease' }} />
+                <div className="flex items-center justify-between py-3 pr-3 pl-[18px]">
+                  <span className="text-[11.5px] flex items-center gap-[5px]" style={{ color: 'var(--light)' }}>
+                    <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="var(--light)" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                    Upload resume or paste JD
+                  </span>
+                  <button className="w-8 h-8 rounded-full border-none flex items-center justify-center cursor-pointer transition-transform hover:scale-105" style={{ background: 'var(--black)' }}>
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="var(--white)" strokeWidth="2.5"><line x1="12" y1="19" x2="12" y2="5" /><polyline points="5 12 12 5 19 12" /></svg>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
