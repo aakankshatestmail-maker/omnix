@@ -7,6 +7,7 @@ export default function HeroAnimated() {
   const navigate = useNavigate()
   const [navigating, setNavigating] = useState(false)
   const [activeIdx, setActiveIdx] = useState(0)
+  const [prevIdx, setPrevIdx] = useState(-1)
   const [isBlack, setIsBlack] = useState(false)
   const [isActive, setIsActive] = useState(false)
   const [inputValue, setInputValue] = useState('')
@@ -18,19 +19,45 @@ export default function HeroAnimated() {
   const typingRef = useRef(null)
   const inputRef = useRef(null)
   const isActiveRef = useRef(false)
+  const isFirstCycle = useRef(true)
 
-  const flashBg = useCallback((idx) => {
-    const c = blobColors[idx]
+  // Position rise — fires with text animation
+  const flashBgPosition = useCallback((idx) => {
     const p = blobPositions[idx]
     ;[blob1, blob2, blob3].forEach((ref, i) => {
       if (!ref.current) return
+      const target = [p.b1, p.b2, p.b3][i]
       ref.current.style.transition = 'none'
-      ref.current.style.background = c[i]
+      ref.current.style.transform = target + ' translateY(32px)'
       void ref.current.offsetHeight
-      ref.current.style.transition = 'transform 1.2s cubic-bezier(.16,1,.3,1)'
-      ref.current.style.transform = [p.b1, p.b2, p.b3][i]
+      ref.current.style.transition = 'transform 1.1s cubic-bezier(.16,1,.3,1)'
+      ref.current.style.transform = target
     })
   }, [])
+
+  // Color fade — duration matches text enter animation (0.52s)
+  const flashBgColor = useCallback((idx) => {
+    const c = blobColors[idx]
+    ;[blob1, blob2, blob3].forEach((ref, i) => {
+      if (!ref.current) return
+      ref.current.style.transition = 'background 0.52s ease'
+      ref.current.style.background = c[i]
+    })
+  }, [])
+
+  // Initial load — set both immediately (no cycling yet)
+  const flashBg = useCallback((idx) => {
+    flashBgPosition(idx)
+    flashBgColor(idx)
+  }, [flashBgPosition, flashBgColor])
+
+  // Fires after React commits text DOM — perfectly synced with new text appearing
+  useEffect(() => {
+    if (isFirstCycle.current) { isFirstCycle.current = false; return }
+    if (isActiveRef.current) return
+    flashBgPosition(activeIdx)
+    flashBgColor(activeIdx)
+  }, [activeIdx]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const typeText = useCallback((text, cb) => {
     const el = cmdTextRef.current
@@ -109,20 +136,19 @@ export default function HeroAnimated() {
     let cur = 0
     function cycle() {
       const ni = (cur + 1) % heroLines.length
-      setIsBlack(false)
-      setActiveIdx(-1)
 
       const advance = () => {
-        setActiveIdx(ni)
         setIsBlack(false)
+        setPrevIdx(cur)
+        setActiveIdx(ni)
         setTimeout(() => setIsBlack(true), 600)
+        setTimeout(() => setPrevIdx(-1), 500)
         cur = ni
         setTimeout(cycle, heroScenes[ni].hold + 1200)
       }
 
       if (!isActiveRef.current) {
         if (cmdCardsRef.current) cmdCardsRef.current.classList.remove('visible')
-        flashBg(ni)
         clearText(() => {
           if (!isActiveRef.current) showScene(ni)
           setTimeout(advance, 580)
@@ -151,26 +177,36 @@ export default function HeroAnimated() {
       <div ref={blob2} className="absolute rounded-full pointer-events-none" style={{ width: 420, height: 360, top: '6%', right: '3%', filter: 'blur(80px)', background: 'rgba(255,210,180,.3)' }} />
       <div ref={blob3} className="absolute rounded-full pointer-events-none" style={{ width: 320, height: 320, bottom: '12%', left: '50%', transform: 'translateX(-50%)', filter: 'blur(80px)', background: 'rgba(200,230,200,.25)' }} />
 
-      <div className="relative z-[1] flex flex-col items-center gap-5 w-full max-w-[720px]">
-        {/* H2 */}
-        <p className="sr font-sans text-[clamp(14px,2vw,17px)] font-normal" style={{ color: 'var(--mid)' }}>
+      <div className="relative z-[1] flex flex-col items-center w-full max-w-[720px]">
+        {/* Logo mark */}
+        <img src="/logo.png" alt="Omni" className="sr w-20 sm:w-24 h-auto mb-5" />
+
+        {/* Eyebrow badge */}
+        <p className="sr inline-flex items-center gap-1.5 rounded-full px-3.5 py-[5px] text-[12.5px] font-medium tracking-wide mb-1" style={{ background: 'rgba(65,65,252,0.07)', color: 'var(--mid)' }}>
           Meet Omni — Your AI career agent
         </p>
 
         {/* H1 cycling */}
-        <div className="sr relative w-full flex items-center justify-center" style={{ height: 'clamp(56px, 8vw, 96px)' }}>
-          {heroLines.map((line, i) => (
+        <div className="sr relative w-full flex items-center justify-center mb-5" style={{ height: 'clamp(80px, 10vw, 96px)' }}>
+          {heroLines.map((line, i) => {
+            const isEntering = activeIdx === i
+            const isExiting = prevIdx === i
+            return (
             <span
               key={i}
-              className="absolute whitespace-nowrap"
+              className="absolute w-full text-center sm:whitespace-nowrap"
               style={{
-                fontSize: 'clamp(36px, 5.5vw, 72px)',
+                fontSize: 'clamp(30px, 5.5vw, 72px)',
                 fontWeight: 700,
                 letterSpacing: '-0.03em',
-                lineHeight: 1,
-                opacity: activeIdx === i ? 1 : 0,
-                transition: 'opacity 0.55s ease',
-                ...(activeIdx === i && isBlack
+                lineHeight: 1.15,
+                opacity: isEntering || isExiting ? undefined : 0,
+                animation: isEntering
+                  ? 'heroLineEnter 0.52s cubic-bezier(.16,1,.3,1) forwards'
+                  : isExiting
+                  ? 'heroLineExit 0.38s ease forwards'
+                  : 'none',
+                ...(isEntering && isBlack
                   ? { color: 'var(--black)', WebkitTextFillColor: 'var(--black)' }
                   : {
                       background: line.gradient,
@@ -182,11 +218,12 @@ export default function HeroAnimated() {
             >
               {line.text}
             </span>
-          ))}
+            )
+          })}
         </div>
 
         {/* CTA */}
-        <button className="sr relative z-[2] inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white shadow-lg hover:opacity-90 transition-all mt-1 border-none cursor-pointer" style={{ backgroundColor: '#4141fc', opacity: 1 }}>
+        <button className="sr relative z-[2] inline-flex items-center justify-center gap-2 rounded-full px-7 py-3.5 text-base font-semibold text-white shadow-lg hover:opacity-90 transition-all mb-5 border-none cursor-pointer" style={{ backgroundColor: '#4141fc', opacity: 1 }}>
           Get started for free
           
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -195,7 +232,7 @@ export default function HeroAnimated() {
         </button>
 
         {/* Command card wrap */}
-        <div className="sr relative w-full max-w-[620px] mt-2">
+        <div className="sr relative w-full max-w-[620px] mb-4">
           {/* Ghost window */}
           <div className="absolute pointer-events-none hidden md:block" style={{ width: 480, height: 300, left: '50%', top: '50%', transform: 'translate(-50%,-52%)', border: '1px solid rgba(26,25,23,.06)', borderRadius: 12, background: 'rgba(255,255,255,.2)' }}>
             <div className="flex items-center gap-1 px-2.5" style={{ height: 26, borderBottom: '1px solid rgba(26,25,23,.04)' }}>
@@ -226,14 +263,15 @@ export default function HeroAnimated() {
               transform: navigating ? 'scale(1.025)' : 'scale(1)',
               transition: 'transform 0.28s cubic-bezier(.16,1,.3,1), box-shadow 0.28s ease, border-color 0.2s ease',
               cursor: isActive ? 'default' : 'text',
-              minHeight: 120,
+              minHeight: 168,
+              height: 168,
             }}
             onClick={!isActive ? handleActivate : undefined}
           >
             {isActive ? (
               /* ── Active / interactive state ── */
-              <div key="active" className="flex flex-col" style={{ minHeight: 120 }}>
-                <div className="flex items-start gap-2.5 pt-4 px-[18px] flex-1">
+              <div key="active" className="flex flex-col h-full">
+                <div className="flex items-start gap-2.5 pt-4 px-[18px]">
                   <svg className="w-[17px] h-[17px] flex-shrink-0 mt-[3px]" viewBox="0 0 24 24" fill="none" stroke="var(--light)" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
                   <textarea
                     ref={inputRef}
@@ -242,13 +280,13 @@ export default function HeroAnimated() {
                     onKeyDown={e => {
                       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit() }
                     }}
-                    rows={1}
+                    rows={2}
                     placeholder="Ask Omni anything about your job search…"
-                    className="text-[14.5px] leading-[1.5] flex-1 min-h-[22px] text-left bg-transparent outline-none resize-none placeholder:text-[color:var(--light)]"
-                    style={{ color: 'var(--black)' }}
+                    className="text-[14.5px] leading-[1.5] flex-1 text-left bg-transparent outline-none resize-none placeholder:text-[color:var(--light)]"
+                    style={{ color: 'var(--black)', height: 44, overflowY: 'hidden' }}
                   />
                 </div>
-                <div className="flex items-center justify-between pb-2.5 pr-2.5 pl-[18px] pt-1">
+                <div className="mt-auto flex items-center justify-between pb-2.5 pr-2.5 pl-[18px] pt-1">
                   <div className="flex items-center gap-0.5">
                     <button type="button" className="w-9 h-9 flex items-center justify-center rounded-full transition-colors hover:bg-black/[0.04]" style={{ color: 'var(--mid)' }}>
                       <Paperclip className="w-4 h-4" />
@@ -273,15 +311,15 @@ export default function HeroAnimated() {
               </div>
             ) : (
               /* ── Animated / teaser state ── */
-              <div key="animated">
+              <div key="animated" className="flex flex-col h-full">
                 <div className="flex items-start gap-2.5 pt-4 px-[18px]">
                   <svg className="w-[17px] h-[17px] flex-shrink-0 mt-[3px]" viewBox="0 0 24 24" fill="none" stroke="var(--light)" strokeWidth="2"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-                  <div ref={cmdTextRef} className="text-[14.5px] leading-[1.5] flex-1 min-h-[22px] text-left" style={{ color: 'var(--black)' }}>
+                  <div ref={cmdTextRef} className="text-[14.5px] leading-[1.5] flex-1 text-left" style={{ color: 'var(--black)', height: 44, overflow: 'hidden' }}>
                     <span style={{ display: 'inline-block', width: '1.5px', height: 16, background: 'var(--mid)', verticalAlign: 'text-bottom', marginLeft: 1, animation: 'blink .8s steps(1) infinite' }} />
                   </div>
                 </div>
-                <div ref={cmdCardsRef} className="px-[18px] pt-3 flex gap-2 flex-wrap" style={{ opacity: 0, transform: 'translateY(6px)', transition: 'opacity .4s ease, transform .4s ease' }} />
-                <div className="flex items-center justify-between pb-2.5 pr-2.5 pl-[18px] pt-1">
+                <div ref={cmdCardsRef} className="px-[18px] pt-3 flex gap-2 flex-wrap overflow-hidden" style={{ opacity: 0, transform: 'translateY(6px)', transition: 'opacity .4s ease, transform .4s ease', height: 44 }} />
+                <div className="mt-auto flex items-center justify-between pb-2.5 pr-2.5 pl-[18px] pt-1">
                   <div className="flex items-center gap-0.5">
                     <button type="button" className="w-9 h-9 flex items-center justify-center rounded-full transition-colors hover:bg-black/[0.04]" style={{ color: 'var(--mid)' }}>
                       <Paperclip className="w-4 h-4" />

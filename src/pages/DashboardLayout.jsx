@@ -148,14 +148,16 @@ function Sidebar({ open, onToggle, onClose, onSignOut, onOpenSettings, isGuest }
               <img src="/logo.png" alt="Omni" className="h-12 w-12 object-contain" />
               <span className="text-[15px] font-semibold tracking-tight text-[#0b0b14]">Omni</span>
             </Link>
-            <button
-              type="button"
-              onClick={onToggle}
-              aria-label="Hide sidebar"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#5b5b6e] hover:bg-black/[0.04] hover:text-[#0b0b14] transition-colors"
-            >
-              <PanelLeft className="h-4 w-4" />
-            </button>
+            {!isGuest && (
+              <button
+                type="button"
+                onClick={onToggle}
+                aria-label="Hide sidebar"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#5b5b6e] hover:bg-black/[0.04] hover:text-[#0b0b14] transition-colors"
+              >
+                <PanelLeft className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
           <div className="px-3">
@@ -268,21 +270,23 @@ export default function DashboardLayout({ children }) {
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <main className="relative flex h-full flex-1 flex-col overflow-hidden" style={{ animation: 'slideUpFade 0.38s cubic-bezier(.16,1,.3,1) both' }}>
         <header className="relative flex h-14 shrink-0 items-center justify-center border-b border-[#ececf3] bg-white/90 px-4 backdrop-blur-md md:hidden">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Show sidebar"
-            className="absolute left-3 flex h-9 w-9 items-center justify-center rounded-lg text-[#5b5b6e] hover:bg-black/[0.04] hover:text-[#0b0b14] transition-colors"
-          >
-            <PanelLeft className="h-4 w-4" />
-          </button>
+          {!isGuest && (
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Show sidebar"
+              className="absolute left-3 flex h-9 w-9 items-center justify-center rounded-lg text-[#5b5b6e] hover:bg-black/[0.04] hover:text-[#0b0b14] transition-colors"
+            >
+              <PanelLeft className="h-4 w-4" />
+            </button>
+          )}
           <Link to="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Omni" className="h-12 w-12 object-contain" />
             <span className="text-[15px] font-semibold tracking-tight text-[#0b0b14]">Omni</span>
           </Link>
         </header>
 
-        {!sidebarOpen && (
+        {!sidebarOpen && !isGuest && (
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
@@ -294,20 +298,20 @@ export default function DashboardLayout({ children }) {
         )}
 
         {isGuest && (
-          <div className="shrink-0 flex items-center justify-between gap-3 border-b border-[#ececf3] bg-[#fafafc] px-24px py-2.5">
-            <p className="text-xs text-[#5b5b6e]">
-              Sign up save your chats and unlock all features.
+          <div className="shrink-0 flex flex-col gap-3 border-b border-[#ececf3] bg-[#fafafc] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 sm:py-2.5">
+            <p className="text-sm text-[#5b5b6e] text-center sm:text-left">
+              Sign up to save your chats and unlock all features.
             </p>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center justify-center gap-2.5 shrink-0">
               <Link
                 to="/"
-                className="rounded-lg border border-[#ececf3] bg-white px-3 py-1.5 text-xs font-medium text-[#0b0b14] hover:bg-black/[0.03] transition-colors"
+                className="rounded-lg border border-[#ececf3] bg-white px-4 py-2 text-sm font-medium text-[#0b0b14] hover:bg-black/[0.03] transition-colors"
               >
                 Log in
               </Link>
               <Link
                 to="/"
-                className="rounded-lg bg-[#0b0b14] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1e1e2e] transition-colors"
+                className="rounded-lg bg-[#0b0b14] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1e1e2e] transition-colors"
               >
                 Get started
               </Link>
