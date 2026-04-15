@@ -2,7 +2,7 @@ export const heroLines = [
   { text: 'Your job search agent.', gradient: 'linear-gradient(90deg, #3b82f6, #6366f1)' },
   { text: 'Your resume builder.', gradient: 'linear-gradient(90deg, #8b5cf6, #ec4899)' },
   { text: 'Your interview coach.', gradient: 'linear-gradient(90deg, #f59e0b, #f97316)' },
-  { text: 'Your career, on autopilot.', gradient: 'linear-gradient(90deg, #10b981, #06b6d4)' },
+  { text: 'Your career on autopilot.', gradient: 'linear-gradient(90deg, #10b981, #06b6d4)' },
 ]
 
 export const blobColors = [

@@ -6,7 +6,7 @@ export const pillars = [
   },
   {
     title: 'Auto\nApply',
-    desc: 'Let Omni apply to matching roles for you — one click, hundreds of applications',
+    desc: 'Let Omni apply to hundreds of roles every day—no more manual form filling.',
     img: '/pillars/auto-apply.png',
   },
   {

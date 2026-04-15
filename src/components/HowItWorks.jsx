@@ -34,7 +34,7 @@ const steps = [
     desc: 'One tap to submit. Omni fills forms, attaches tailored docs, and tracks every application — so you never lose a lead or miss a deadline.',
     messages: [
       { from: 'user', text: 'Apply to all 5 shortlisted roles and track them for me.' },
-      { from: 'bot', text: 'Done. 5 applications submitted — 3 via LinkedIn Easy Apply, 2 through company portals. I\'ll notify you when they respond.' },
+      { from: 'bot', text: 'Done. 5 job applications submitted along with custom resumes for each. I\'ll notify you when they respond.' },
     ],
     channels: ['Automated', 'Web'],
   },

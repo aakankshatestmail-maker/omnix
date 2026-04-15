@@ -1,5 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { X } from 'lucide-react'
+import { Briefcase, X, Zap } from 'lucide-react'
+
+const BENEFITS = [
+  { icon: Zap, label: 'Auto apply to latest jobs' },
+  { icon: Briefcase, label: 'Get personalised ', desc: 'Daily job recommendations tailored to your profile' },
+]
 
 export default function SignupModal({ onDismiss }) {
   const navigate = useNavigate()
@@ -40,24 +45,29 @@ export default function SignupModal({ onDismiss }) {
           </div>
 
           <h2 className="text-[22px] font-semibold tracking-tight text-[#0b0b14] leading-snug mb-1.5">
-            Your AI job search copilot
+            Sign up to continue
           </h2>
-          <p className="text-sm text-[#5b5b6e] mb-6 leading-relaxed">
-            Free account. No credit card. Start applying smarter in minutes.
+          <p className="text-sm text-[#5b5b6e] mb-7 leading-relaxed">
+            Create a free account to save your conversation history and unlock all features.
           </p>
 
-          {/* Features pill row */}
-          <div className="flex flex-wrap gap-2 mb-8">
-            {['Auto-apply to jobs', 'Company & salary insights', 'Resume & interview prep'].map((f) => (
-              <span
-                key={f}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[#4141fc]/20 bg-[#4141fc]/[0.06] px-3 py-1 text-xs font-medium text-[#4141fc]"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-[#4141fc]" />
-                {f}
-              </span>
-            ))}
-          </div>
+          {/* Benefits */}
+          <ul className="flex flex-col gap-4 mb-8">
+            {BENEFITS.map(({ icon, label, desc }) => {
+              const Icon = icon
+              return (
+                <li key={label} className="flex items-center gap-4">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#4141fc]/10 text-[#4141fc]">
+                    <Icon className="h-4.5 w-4.5" />
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold text-[#0b0b14]">{label}</p>
+                    <p className="text-xs text-[#9a9aae] leading-relaxed">{desc}</p>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
 
           <button
             type="button"

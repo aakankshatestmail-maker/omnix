@@ -148,16 +148,14 @@ function Sidebar({ open, onToggle, onClose, onSignOut, onOpenSettings, isGuest }
               <img src="/logo.png" alt="Omni" className="h-12 w-12 object-contain" />
               <span className="text-[15px] font-semibold tracking-tight text-[#0b0b14]">Omni</span>
             </Link>
-            {!isGuest && (
-              <button
-                type="button"
-                onClick={onToggle}
-                aria-label="Hide sidebar"
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#5b5b6e] hover:bg-black/[0.04] hover:text-[#0b0b14] transition-colors"
-              >
-                <PanelLeft className="h-4 w-4" />
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={onToggle}
+              aria-label="Hide sidebar"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#5b5b6e] hover:bg-black/[0.04] hover:text-[#0b0b14] transition-colors"
+            >
+              <PanelLeft className="h-4 w-4" />
+            </button>
           </div>
 
           <div className="px-3">
@@ -270,23 +268,21 @@ export default function DashboardLayout({ children }) {
       <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <main className="relative flex h-full flex-1 flex-col overflow-hidden" style={{ animation: 'slideUpFade 0.38s cubic-bezier(.16,1,.3,1) both' }}>
         <header className="relative flex h-14 shrink-0 items-center justify-center border-b border-[#ececf3] bg-white/90 px-4 backdrop-blur-md md:hidden">
-          {!isGuest && (
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              aria-label="Show sidebar"
-              className="absolute left-3 flex h-9 w-9 items-center justify-center rounded-lg text-[#5b5b6e] hover:bg-black/[0.04] hover:text-[#0b0b14] transition-colors"
-            >
-              <PanelLeft className="h-4 w-4" />
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(true)}
+            aria-label="Show sidebar"
+            className="absolute left-3 flex h-9 w-9 items-center justify-center rounded-lg text-[#5b5b6e] hover:bg-black/[0.04] hover:text-[#0b0b14] transition-colors"
+          >
+            <PanelLeft className="h-4 w-4" />
+          </button>
           <Link to="/" className="flex items-center gap-2">
             <img src="/logo.png" alt="Omni" className="h-12 w-12 object-contain" />
             <span className="text-[15px] font-semibold tracking-tight text-[#0b0b14]">Omni</span>
           </Link>
         </header>
 
-        {!sidebarOpen && !isGuest && (
+        {!sidebarOpen && (
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
@@ -298,9 +294,9 @@ export default function DashboardLayout({ children }) {
         )}
 
         {isGuest && (
-          <div className="shrink-0 flex items-center justify-between gap-3 border-b border-[#ececf3] bg-[#fafafc] py-2.5 px-5">
+          <div className="shrink-0 flex items-center justify-between gap-3 border-b border-[#ececf3] bg-[#fafafc] px-24px py-2.5">
             <p className="text-xs text-[#5b5b6e]">
-              You're previewing Omni — sign in to save your chats and unlock all features.
+              Sign up save your chats and unlock all features.
             </p>
             <div className="flex items-center gap-2 shrink-0">
               <Link
